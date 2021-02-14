@@ -43,6 +43,11 @@ export const RepositoryInfo = styled.section`
       color: #3d3d4d;
     }
 
+    svg{
+      margin-left: 10px;
+      cursor: pointer;
+    }
+
     p{
       font-size: 18px;
       color: #737380;

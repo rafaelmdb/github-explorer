@@ -47,6 +47,7 @@ const Dashboard: React.FC = ()=>{
 
             setRepositories([...repositories, repository]);
             setInputError('');
+            setNewRepo('');
         }
         catch(err){
             setInputError('Erro na busca pelo repositório');

@@ -1,10 +1,11 @@
 import React, {useEffect, useState} from 'react';
-import {useRouteMatch, Link} from 'react-router-dom';
-import {FiChevronLeft, FiChevronRight} from 'react-icons/fi';
+import {useRouteMatch, Link, Redirect, Router, useHistory} from 'react-router-dom';
+import {FiChevronLeft, FiChevronRight, FiTrash} from 'react-icons/fi';
 import {Header, RepositoryInfo, Issues} from './styles';
 import logoImg from '../../assets/1587379765556-attachment.svg';
 import fotoPerfil from '../../assets/69557631.png';
 import api from '../../services/api';
+import Routes from '../../routes';
 
 interface RepositoryParams{
     repository: string;
@@ -37,6 +38,7 @@ const Repository:React.FC = ()=>{
     const [repository, setRepository] = useState<RepositoryData | null>(null);
     const [issues, setIssues] = useState<Issue[]>([]);
     const {params} = useRouteMatch<RepositoryParams>();
+    const history = useHistory();
 
     useEffect(()=>{
         api.get(`repos/${params.repository}`).then((response)=>{
@@ -61,6 +63,22 @@ const Repository:React.FC = ()=>{
 
     }, [params.repository]);
 
+    function handleRemoveRepository(full_name: string) {
+        if (!confirm('Remover repositório?')){
+            return;
+        }
+
+        const storagedRepositories = localStorage.getItem('@github-explorer:repositories');
+
+        if (storagedRepositories){
+            const repositories = JSON.parse(storagedRepositories);
+            const newStoragedRepositories = repositories.filter((repo: { full_name: string; })=>repo.full_name!==full_name);
+            localStorage.setItem('@github-explorer:repositories', JSON.stringify(newStoragedRepositories));
+        }
+
+        history.push('/');
+    }
+
     return (
         <>
             <Header>
@@ -76,7 +94,7 @@ const Repository:React.FC = ()=>{
                     <header>
                         <img src={repository.owner.avatar_url} alt={repository.owner.login}></img>
                         <div>
-                            <strong>{repository.full_name}</strong>
+                            <strong>{repository.full_name}</strong><FiTrash onClick={()=>handleRemoveRepository(repository.full_name)}/>
                             <p>{repository.description}</p>
                         </div>
                     </header>
@@ -94,6 +112,7 @@ const Repository:React.FC = ()=>{
                             <span>Issues</span>
                         </li>
                     </ul>
+                   
                 </RepositoryInfo>
             ): (<p>Carregando...</p>)}
 
